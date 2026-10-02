@@ -1,0 +1,177 @@
+import { TargetUnitItem } from './unitTypes';
+
+export const GRADE_3_UNITS: TargetUnitItem[] = [
+  {
+    id: 'g3_gs_u1',
+    grade: 3,
+    textbook: 'Global Success',
+    unitNumber: 1,
+    unitTitleEn: 'Hello',
+    unitTitleVi: 'Xin chào',
+    theme: 'Greetings and Introductions',
+    targetKeywords: [
+      { word: 'hello', phonetic: '/həˈləʊ/', meaningVi: 'xin chào', partOfSpeech: 'int' },
+      { word: 'hi', phonetic: '/haɪ/', meaningVi: 'chào thân mật', partOfSpeech: 'int' },
+      { word: 'fine', phonetic: '/faɪn/', meaningVi: 'khỏe mạnh', partOfSpeech: 'adj' },
+      { word: 'thank you', phonetic: '/ˈθæŋk juː/', meaningVi: 'cảm ơn', partOfSpeech: 'phrase' },
+      { word: 'goodbye', phonetic: '/ˌɡʊdˈbaɪ/', meaningVi: 'tạm biệt', partOfSpeech: 'int' },
+      { word: 'bye', phonetic: '/baɪ/', meaningVi: 'chào tạm biệt', partOfSpeech: 'int' },
+    ],
+    keyGrammarPatterns: [
+      {
+        pattern: "Hello, I'm + [Name]. / Hi, [Name].",
+        explanationVi: 'Chào và tự giới thiệu tên mình',
+        example: "Hello, I'm Linh. - Hi, Linh. I'm Ben.",
+      },
+      {
+        pattern: "How are you? - I'm fine, thank you. / Fine, thanks.",
+        explanationVi: 'Hỏi thăm sức khỏe',
+        example: "How are you, Mai? - I'm fine, thank you.",
+      },
+    ],
+  },
+  {
+    id: 'g3_gs_u2',
+    grade: 3,
+    textbook: 'Global Success',
+    unitNumber: 2,
+    unitTitleEn: 'Our Names',
+    unitTitleVi: 'Tên của chúng em',
+    theme: 'Identity and Spelling Names',
+    targetKeywords: [
+      { word: 'name', phonetic: '/neɪm/', meaningVi: 'tên', partOfSpeech: 'n' },
+      { word: 'spell', phonetic: '/spel/', meaningVi: 'đánh vần', partOfSpeech: 'v' },
+      { word: 'what', phonetic: '/wɒt/', meaningVi: 'gì, cái gì', partOfSpeech: 'pron' },
+      { word: 'how', phonetic: '/haʊ/', meaningVi: 'như thế nào', partOfSpeech: 'adv' },
+    ],
+    keyGrammarPatterns: [
+      {
+        pattern: "What's your name? - My name's + [Name].",
+        explanationVi: 'Hỏi và trả lời về tên',
+        example: "What's your name? - My name's Nam.",
+      },
+      {
+        pattern: 'How do you spell your name? - [Spelling letters].',
+        explanationVi: 'Hỏi cách đánh vần tên',
+        example: 'How do you spell your name? - L-I-N-H.',
+      },
+    ],
+  },
+  {
+    id: 'g3_gs_u3',
+    grade: 3,
+    textbook: 'Global Success',
+    unitNumber: 3,
+    unitTitleEn: 'Our Friends',
+    unitTitleVi: 'Bạn bè của chúng em',
+    theme: 'Introducing Friends',
+    targetKeywords: [
+      { word: 'this', phonetic: '/ðɪs/', meaningVi: 'đây, người này', partOfSpeech: 'pron' },
+      { word: 'that', phonetic: '/ðæt/', meaningVi: 'kia, người kia', partOfSpeech: 'pron' },
+      { word: 'friend', phonetic: '/frend/', meaningVi: 'bạn bè', partOfSpeech: 'n' },
+      { word: 'yes', phonetic: '/jes/', meaningVi: 'vâng, đúng', partOfSpeech: 'adv' },
+      { word: 'no', phonetic: '/nəʊ/', meaningVi: 'không phải', partOfSpeech: 'adv' },
+    ],
+    keyGrammarPatterns: [
+      {
+        pattern: 'This is + [Name].',
+        explanationVi: 'Giới thiệu bạn ở gần mình',
+        example: 'This is Mary. She is my friend.',
+      },
+      {
+        pattern: "Is that + [Name]? - Yes, it is. / No, it isn't.",
+        explanationVi: 'Hỏi xác nhận người ở đằng xa',
+        example: "Is that Peter? - Yes, it is. / No, it isn't. It's Tony.",
+      },
+    ],
+  },
+  {
+    id: 'g3_gs_u4',
+    grade: 3,
+    textbook: 'Global Success',
+    unitNumber: 4,
+    unitTitleEn: 'Our Bodies',
+    unitTitleVi: 'Cơ thể của chúng em',
+    theme: 'Body Parts and Commands',
+    targetKeywords: [
+      { word: 'eye', phonetic: '/aɪ/', meaningVi: 'mắt', partOfSpeech: 'n' },
+      { word: 'ear', phonetic: '/ɪə(r)/', meaningVi: 'tai', partOfSpeech: 'n' },
+      { word: 'nose', phonetic: '/nəʊz/', meaningVi: 'mũi', partOfSpeech: 'n' },
+      { word: 'mouth', phonetic: '/maʊθ/', meaningVi: 'miệng', partOfSpeech: 'n' },
+      { word: 'face', phonetic: '/feɪs/', meaningVi: 'khuôn mặt', partOfSpeech: 'n' },
+      { word: 'hand', phonetic: '/hænd/', meaningVi: 'bàn tay', partOfSpeech: 'n' },
+    ],
+    keyGrammarPatterns: [
+      {
+        pattern: 'Touch your [face/nose/ear/eye/hand]! / Open your mouth!',
+        explanationVi: 'Hiệu lệnh chạm vào các bộ phận trên cơ thể',
+        example: 'Touch your nose. Touch your face.',
+      },
+      {
+        pattern: "What's this/that? - It's an / a + [body part].",
+        explanationVi: 'Hỏi và trả lời bộ phận cơ thể',
+        example: "What's this? - It's an eye.",
+      },
+    ],
+  },
+  {
+    id: 'g3_gs_u5',
+    grade: 3,
+    textbook: 'Global Success',
+    unitNumber: 5,
+    unitTitleEn: 'My Hobbies',
+    unitTitleVi: 'Sở thích của em',
+    theme: 'Hobbies and Interests',
+    targetKeywords: [
+      { word: 'singing', phonetic: '/ˈsɪŋɪŋ/', meaningVi: 'ca hát', partOfSpeech: 'n' },
+      { word: 'drawing', phonetic: '/ˈdrɔːɪŋ/', meaningVi: 'vẽ tranh', partOfSpeech: 'n' },
+      { word: 'dancing', phonetic: '/ˈdɑːnsɪŋ/', meaningVi: 'nhảy múa', partOfSpeech: 'n' },
+      { word: 'swimming', phonetic: '/ˈswɪmɪŋ/', meaningVi: 'bơi lội', partOfSpeech: 'n' },
+      { word: 'reading', phonetic: '/ˈriːdɪŋ/', meaningVi: 'đọc sách', partOfSpeech: 'n' },
+      { word: 'cooking', phonetic: '/ˈkʊkɪŋ/', meaningVi: 'nấu ăn', partOfSpeech: 'n' },
+    ],
+    keyGrammarPatterns: [
+      {
+        pattern: "What's your hobby? - It's + [V-ing].",
+        explanationVi: 'Hỏi và trả lời về sở thích',
+        example: "What's your hobby? - It's singing.",
+      },
+      {
+        pattern: 'I like + [V-ing].',
+        explanationVi: 'Nói mình thích làm hoạt động gì',
+        example: 'I like drawing and dancing.',
+      },
+    ],
+  },
+  {
+    id: 'g3_gs_u6',
+    grade: 3,
+    textbook: 'Global Success',
+    unitNumber: 6,
+    unitTitleEn: 'Our School',
+    unitTitleVi: 'Trường học của chúng em',
+    theme: 'School Places and Adjectives',
+    targetKeywords: [
+      { word: 'school', phonetic: '/skuːl/', meaningVi: 'trường học', partOfSpeech: 'n' },
+      { word: 'classroom', phonetic: '/ˈklɑːsruːm/', meaningVi: 'lớp học', partOfSpeech: 'n' },
+      { word: 'library', phonetic: '/ˈlaɪbrəri/', meaningVi: 'thư viện', partOfSpeech: 'n' },
+      { word: 'playground', phonetic: '/ˈpleɪɡraʊnd/', meaningVi: 'sân trường', partOfSpeech: 'n' },
+      { word: 'gym', phonetic: '/dʒɪm/', meaningVi: 'phòng tập thể dục', partOfSpeech: 'n' },
+      { word: 'big', phonetic: '/bɪɡ/', meaningVi: 'to lớn', partOfSpeech: 'adj' },
+      { word: 'new', phonetic: '/njuː/', meaningVi: 'mới', partOfSpeech: 'adj' },
+      { word: 'small', phonetic: '/smɔːl/', meaningVi: 'nhỏ nhắn', partOfSpeech: 'adj' },
+    ],
+    keyGrammarPatterns: [
+      {
+        pattern: "Is this our [school/classroom/library/gym/playground]? - Yes, it is. / No, it isn't.",
+        explanationVi: 'Hỏi xem đây có phải phòng/khu vực trường của chúng mình không',
+        example: 'Is this our library? - Yes, it is.',
+      },
+      {
+        pattern: "Is the [library/classroom] [big/small/new/old]? - Yes, it is. / No, it isn't.",
+        explanationVi: 'Hỏi kích thước, tính chất của phòng học',
+        example: 'Is the playground big? - Yes, it is.',
+      },
+    ],
+  },
+];
