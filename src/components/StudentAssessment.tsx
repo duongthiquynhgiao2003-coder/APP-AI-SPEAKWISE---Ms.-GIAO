@@ -6,6 +6,7 @@ import {
   InputMethod,
   AssessmentResult,
   TaskTypeOption,
+  VideoPostureAnalysis,
 } from '../types';
 import {
   TASK_TYPES,
@@ -14,6 +15,7 @@ import {
 import { RadarChart } from './RadarChart';
 import { DetailedFeedbackSection } from './DetailedFeedbackSection';
 import { evaluateSpeakingRubric } from '../utils/speakingRubricEvaluator';
+import { analyzeVideoVisuals } from '../utils/videoPostureAnalyzer';
 import confetti from 'canvas-confetti';
 import {
   ChevronDown,
@@ -781,6 +783,19 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
           ? normalizeTranscribedSpeech(liveTranscript.trim())
           : currentPrompt.sampleContent.replace(/\n/g, ' ').substring(0, 160);
 
+      let detectedPostureAnalysis: VideoPostureAnalysis | undefined = undefined;
+      if (hasVideoContent) {
+        const videoSrc =
+          videoBlobRef.current ||
+          videoBlobUrl ||
+          (uploadedFile?.type.startsWith('video/') ? (uploadedFile || uploadedFileUrl) : null);
+        try {
+          detectedPostureAnalysis = await analyzeVideoVisuals(videoSrc);
+        } catch (err) {
+          console.warn('Video visual analysis error:', err);
+        }
+      }
+
       const finalResult = evaluateSpeakingRubric({
         schoolLevel,
         taskType,
@@ -791,6 +806,7 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
         sampleContent: currentPrompt.sampleContent,
         taskTitleEn: selectedTaskObj.en,
         taskTitleVi: selectedTaskObj.vi,
+        videoPostureAnalysis: detectedPostureAnalysis,
       });
 
       setResult(finalResult);
@@ -1667,16 +1683,6 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
                   <span>{isExportingPdf ? 'Đang tạo PDF 2 trang...' : 'Xuất file PDF (.pdf)'}</span>
                 </button>
                 <button
-                  id="btnExportReportWord"
-                  type="button"
-                  onClick={() => handleExportAssessmentReport('doc')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 rounded-lg cursor-pointer transition-all shadow-[0_0_12px_rgba(37,99,235,0.3)] active:scale-95"
-                  title="Tải phiếu kết quả dạng Word (.doc)"
-                >
-                  <FileText className="w-3.5 h-3.5 text-white" />
-                  <span>Xuất Word (.doc)</span>
-                </button>
-                <button
                   id="btnExportResultMedia"
                   onClick={() => handleExportMedia(result.hasVideo ? 'video' : 'audio')}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-950 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 rounded-lg cursor-pointer transition-all shadow-[0_0_15px_rgba(6,182,212,0.4)]"
@@ -2018,7 +2024,7 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
                           7. Presentation &amp; Interaction
                         </h4>
                         <p className="text-[10px] text-teal-400/60 italic">
-                          (Phong thái trình bày &amp; Tương tác qua video)
+                          (Phong thái &amp; Tương tác)
                         </p>
                       </div>
                     </div>

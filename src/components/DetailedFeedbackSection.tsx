@@ -4,6 +4,7 @@ import {
   PhonemeIssue,
   SentenceComparison,
   SpeechMetrics,
+  AssessmentResult,
 } from '../types';
 import {
   Volume2,
@@ -19,6 +20,11 @@ import {
   Lightbulb,
   Mic,
   ChevronDown,
+  Eye,
+  Smile,
+  UserCheck,
+  Camera,
+  Users,
 } from 'lucide-react';
 import { playPedagogicalAudio, stopSpeechAudio } from '../utils/speechPlayer';
 import { normalizeTranscribedSpeech } from '../utils/transcriptPunctuation';
@@ -31,6 +37,7 @@ interface DetailedFeedbackSectionProps {
   strengths?: string[];
   improvementPriorities?: string[];
   transcript?: string;
+  presentationAnalysis?: AssessmentResult['presentationAnalysis'];
   onPlaySentenceAudio?: (text: string) => void;
 }
 
@@ -41,6 +48,7 @@ export const DetailedFeedbackSection: React.FC<DetailedFeedbackSectionProps> = (
   strengths = [],
   improvementPriorities = [],
   transcript,
+  presentationAnalysis,
   onPlaySentenceAudio,
 }) => {
   const [isPlayingFullTranscript, setIsPlayingFullTranscript] = useState(false);
@@ -491,7 +499,101 @@ export const DetailedFeedbackSection: React.FC<DetailedFeedbackSectionProps> = (
         </div>
       </div>
 
-      {/* 3. Real Transcribed Speech Display */}
+      {/* 3. Video Presentation & Interaction Breakdown (if Video) */}
+      {presentationAnalysis?.subRatings && (
+        <div
+          id="detailedPresentationSection"
+          className="bg-[#091124] rounded-2xl p-4 border border-teal-500/35 shadow-[0_0_20px_rgba(20,184,166,0.12)] text-xs text-slate-200"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-3 border-b border-teal-500/20">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-teal-950 border border-teal-500/50 flex items-center justify-center text-teal-300">
+                <Users className="w-3.5 h-3.5" />
+              </div>
+              <div>
+                <h4 className="font-black text-teal-300 uppercase tracking-wider text-xs">
+                  Phân tích Chi tiết Phong thái &amp; Tương tác Video (Presentation &amp; Interaction)
+                </h4>
+                <p className="text-[10px] text-teal-400/70 italic">
+                  Đánh giá đa chiều dựa trên cử chỉ, hướng nhìn, biểu cảm và góc máy thực tế
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] text-slate-400">Điểm phong thái:</span>
+              <span className="px-2.5 py-0.5 rounded-md bg-[#0d2238] border border-teal-500/40 text-teal-200 font-mono font-black text-xs">
+                {presentationAnalysis.score} / 10
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+            <div className="p-3 rounded-xl bg-[#061021] border border-teal-500/20">
+              <div className="flex items-center gap-1.5 font-bold text-teal-300 mb-1">
+                <Eye className="w-3.5 h-3.5 text-teal-400" />
+                <span>Giao tiếp mắt &amp; Ống kính:</span>
+              </div>
+              <div className="text-[11px] font-semibold text-cyan-200 mb-1">
+                {presentationAnalysis.subRatings.eyeContact.labelVi}
+              </div>
+              <p className="text-[11.5px] text-slate-300 leading-snug">
+                {presentationAnalysis.subRatings.eyeContact.commentVi}
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-[#061021] border border-teal-500/20">
+              <div className="flex items-center gap-1.5 font-bold text-teal-300 mb-1">
+                <UserCheck className="w-3.5 h-3.5 text-teal-400" />
+                <span>Tư thế &amp; Ngôn ngữ cơ thể:</span>
+              </div>
+              <div className="text-[11px] font-semibold text-cyan-200 mb-1">
+                {presentationAnalysis.subRatings.posture.labelVi}
+              </div>
+              <p className="text-[11.5px] text-slate-300 leading-snug">
+                {presentationAnalysis.subRatings.posture.commentVi}
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-[#061021] border border-teal-500/20">
+              <div className="flex items-center gap-1.5 font-bold text-teal-300 mb-1">
+                <Smile className="w-3.5 h-3.5 text-teal-400" />
+                <span>Biểu cảm gương mặt:</span>
+              </div>
+              <div className="text-[11px] font-semibold text-cyan-200 mb-1">
+                {presentationAnalysis.subRatings.facialExpression.labelVi}
+              </div>
+              <p className="text-[11.5px] text-slate-300 leading-snug">
+                {presentationAnalysis.subRatings.facialExpression.commentVi}
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-[#061021] border border-teal-500/20">
+              <div className="flex items-center gap-1.5 font-bold text-teal-300 mb-1">
+                <Camera className="w-3.5 h-3.5 text-teal-400" />
+                <span>Khung hình &amp; Ánh sáng:</span>
+              </div>
+              <div className="text-[11px] font-semibold text-cyan-200 mb-1">
+                {presentationAnalysis.subRatings.framingAndLighting.labelVi}
+              </div>
+              <p className="text-[11.5px] text-slate-300 leading-snug">
+                {presentationAnalysis.subRatings.framingAndLighting.commentVi}
+              </p>
+            </div>
+          </div>
+
+          {presentationAnalysis.coachingTipsVi && presentationAnalysis.coachingTipsVi.length > 0 && (
+            <div className="p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-500/30 flex items-start gap-2 text-emerald-200">
+              <Lightbulb className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold text-emerald-300">Gợi ý nâng cao phong thái: </span>
+                <span>{presentationAnalysis.coachingTipsVi.join(' ')}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 4. Real Transcribed Speech Display */}
       {transcript && (
         <div
           id="evaluatedSpeechTranscriptBox"

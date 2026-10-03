@@ -74,7 +74,7 @@ export default function App() {
         <footer id="appFooter" className="bg-slate-950/90 border-t border-slate-800/80 py-2.5 sm:py-3 mt-auto">
           <div className="max-w-6xl mx-auto px-4 text-center">
             <p className="text-xs sm:text-sm font-semibold text-slate-400">
-              <span className="text-cyan-400 font-bold tracking-wide">AI SPEAKWISE</span> – Luyện nói thông minh &amp; Tự tin giao tiếp theo chương trình GDPT 2018
+              <span className="text-cyan-400 font-bold tracking-wide">AI SPEAKWISE</span> • Luyện nói thông minh – Tự tin giao tiếp – Phát triển năng lực tiếng Anh
             </p>
           </div>
         </footer>

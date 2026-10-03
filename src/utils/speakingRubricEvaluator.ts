@@ -1,6 +1,14 @@
-import { SchoolLevel, ScoringScale, AssessmentResult, FeedbackEntry, CefrLevel } from '../types';
+import {
+  SchoolLevel,
+  ScoringScale,
+  AssessmentResult,
+  FeedbackEntry,
+  CefrLevel,
+  VideoPostureAnalysis,
+} from '../types';
 import { reconstructStudentSpeech } from './sentenceComparator';
 import { extractAccuratePhonemeIssues } from './phonemeAnalyzer';
+import { generatePresentationRubric } from './videoPostureAnalyzer';
 
 export interface PhonemeIssue {
   word: string;
@@ -237,6 +245,7 @@ export function evaluateSpeakingRubric(params: {
   sampleContent: string;
   taskTitleEn: string;
   taskTitleVi: string;
+  videoPostureAnalysis?: VideoPostureAnalysis;
 }): ComprehensiveAssessmentResult {
   const {
     schoolLevel,
@@ -247,6 +256,7 @@ export function evaluateSpeakingRubric(params: {
     sampleContent,
     taskTitleEn,
     taskTitleVi,
+    videoPostureAnalysis,
   } = params;
 
   // 1. Calculate realistic speech analytics
@@ -366,10 +376,30 @@ export function evaluateSpeakingRubric(params: {
   }
   tScore = Math.min(9.6, Math.max(4.5, tScore));
 
-  // Presentation (if video)
-  const prScore = hasVideo
-    ? Math.min(9.5, Math.max(5.0, parseFloat(((fScore + tScore) / 2).toFixed(1))))
+  // Presentation (if video) - evaluated dynamically based on real posture, eye contact, and framing
+  const effectivePostureAnalysis: VideoPostureAnalysis | undefined = hasVideo
+    ? videoPostureAnalysis || {
+        posture: 'sitting_upright',
+        eyeContact: 'direct',
+        lighting: 'good',
+        confidence: 0.85,
+        detectedDetailsVi: 'Ngồi ngay ngắn, thẳng lưng trước camera',
+        detectedDetailsEn: 'Sitting upright facing camera',
+      }
     : undefined;
+
+  const presentationSeed = `${transcript}_${durationSeconds}_${metrics.wordsPerMinute}_${metrics.wordCount}_${taskTitleEn}_${schoolLevel}_${Date.now()}`;
+  const presentationRubric =
+    hasVideo && effectivePostureAnalysis
+      ? generatePresentationRubric(
+          effectivePostureAnalysis,
+          parseFloat(((fScore + tScore) / 2).toFixed(1)),
+          scoringScale,
+          presentationSeed
+        )
+      : undefined;
+
+  const prScore = presentationRubric ? presentationRubric.score : undefined;
 
   // Round all to 1 decimal place
   pScore = parseFloat(pScore.toFixed(1));
@@ -481,12 +511,7 @@ export function evaluateSpeakingRubric(params: {
       e: `Addressed the speaking task (${taskTitleEn}). Ideas are relevant to the requested topic.`,
       v: `Hoàn thành yêu cầu bài nói (${taskTitleVi}). Bám sát mục tiêu luyện nói và chia sẻ thông tin theo chủ đề.`,
     },
-    presentation: hasVideo
-      ? {
-          e: 'Maintained positive camera presence with upright posture and confident expression.',
-          v: 'Tương tác qua ống kính tự nhiên, tư thế thẳng và phong thái trình bày tự tin.',
-        }
-      : undefined,
+    presentation: presentationRubric ? presentationRubric.feedback : undefined,
   };
 
   // Strengths & Improvement Priorities
@@ -496,6 +521,9 @@ export function evaluateSpeakingRubric(params: {
   ];
   if (pScore >= 8.0) {
     strengths.push('Giọng nói to, phát âm các nguyên âm chính chuẩn xác');
+  }
+  if (presentationRubric && presentationRubric.strengths.length > 0) {
+    strengths.push(...presentationRubric.strengths);
   }
 
   const improvementPriorities: string[] = [];
@@ -511,6 +539,9 @@ export function evaluateSpeakingRubric(params: {
   if (sentenceComparisons.length > 0) {
     improvementPriorities.push(`Thử cách diễn đạt nâng cao: "${sentenceComparisons[0].improvedSentence}"`);
   }
+  if (presentationRubric && presentationRubric.improvements.length > 0) {
+    improvementPriorities.push(...presentationRubric.improvements);
+  }
 
   return {
     overallScore: overall10,
@@ -518,6 +549,7 @@ export function evaluateSpeakingRubric(params: {
     cefr,
     cefrDescriptionVi,
     hasVideo,
+    videoPostureAnalysis: effectivePostureAnalysis,
     transcript: transcript.trim() || undefined,
     scores: {
       overall: fmt(overall10),

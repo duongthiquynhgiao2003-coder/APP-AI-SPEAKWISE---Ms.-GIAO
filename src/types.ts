@@ -101,6 +101,17 @@ export interface AssessmentResult {
   taskTopicVi?: string;
   videoSnapshotUrl?: string;
   videoSnapshotTime?: string;
+  presentationAnalysis?: {
+    score: number;
+    subRatings: {
+      eyeContact: { rating: string; labelVi: string; labelEn: string; commentVi: string; commentEn: string };
+      posture: { rating: string; labelVi: string; labelEn: string; commentVi: string; commentEn: string };
+      facialExpression: { rating: string; labelVi: string; labelEn: string; commentVi: string; commentEn: string };
+      framingAndLighting: { rating: string; labelVi: string; labelEn: string; commentVi: string; commentEn: string };
+    };
+    keyStrengthsVi: string[];
+    coachingTipsVi: string[];
+  };
 }
 
 export interface PracticePrompt {
