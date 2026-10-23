@@ -479,6 +479,8 @@ function analyzeVideoElement(videoEl: HTMLVideoElement): VideoPostureAnalysis {
       eyeContact: 'direct',
       lighting: 'good',
       confidence: 0.75,
+      detectedDetailsVi: 'Tư thế ngồi ngay ngắn, thẳng lưng trước camera',
+      detectedDetailsEn: 'Sitting upright facing camera',
     };
   }
 
@@ -494,6 +496,9 @@ function analyzeVideoElement(videoEl: HTMLVideoElement): VideoPostureAnalysis {
       posture: 'sitting_upright',
       eyeContact: 'direct',
       lighting: 'good',
+      confidence: 0.75,
+      detectedDetailsVi: 'Tư thế ngồi ngay ngắn, thẳng lưng trước camera',
+      detectedDetailsEn: 'Sitting upright facing camera',
     };
   }
 

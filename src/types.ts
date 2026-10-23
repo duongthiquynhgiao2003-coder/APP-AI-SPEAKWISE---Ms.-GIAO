@@ -66,12 +66,34 @@ export interface SpeechMetrics {
 
 export type CefrLevel = 'Pre-A1' | 'A1' | 'A2' | 'B1' | 'B2' | 'C1';
 
+export type VideoPostureType =
+  | 'sitting_upright'
+  | 'sitting_slouched'
+  | 'sitting_too_close'
+  | 'standing_upright'
+  | 'standing_swaying'
+  | 'lying';
+
+export type VideoEyeContactType = 'direct' | 'looking_down' | 'distracted';
+
+export type VideoLightingType = 'good' | 'dim';
+
+export interface VideoPostureAnalysis {
+  posture: VideoPostureType;
+  eyeContact: VideoEyeContactType;
+  lighting: VideoLightingType;
+  confidence: number;
+  detectedDetailsVi: string;
+  detectedDetailsEn: string;
+}
+
 export interface AssessmentResult {
   overallScore: number;
   scale: ScoringScale;
   cefr: CefrLevel;
   cefrDescriptionVi?: string;
   hasVideo: boolean;
+  videoPostureAnalysis?: VideoPostureAnalysis;
   transcript?: string;
   scores: {
     overall: string;

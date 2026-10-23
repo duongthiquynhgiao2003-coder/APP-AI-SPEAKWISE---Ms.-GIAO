@@ -13,6 +13,8 @@ export interface ReportExportData {
   videoSnapshotTime?: string;
   videoSnapshotSecond?: number;
   totalDurationSeconds?: number;
+  inputMethod?: 'upload' | 'record' | 'video';
+  isTranscriptManuallyEdited?: boolean;
 }
 
 /**
@@ -1947,6 +1949,17 @@ export function buildSpeakingReportHtml(data: ReportExportData, forPdf = false):
         <div class="transcript-box">
           "${result.transcript || 'Chưa có bản ghi lời thoại.'}"
         </div>
+        ${
+          data.inputMethod === 'upload'
+            ? `<div style="font-size: 8.5px; color: #64748b; font-style: italic; margin-top: 3px;">
+                 Nguồn lời nói: học sinh gõ lại từ file tải lên.
+               </div>`
+            : data.isTranscriptManuallyEdited
+            ? `<div style="font-size: 8.5px; color: #64748b; font-style: italic; margin-top: 3px;">
+                 Lời nói có chỉnh sửa tay sau khi máy nhận diện.
+               </div>`
+            : ''
+        }
       </section>
 
       <!-- Section 4: Sign-off Footer -->
