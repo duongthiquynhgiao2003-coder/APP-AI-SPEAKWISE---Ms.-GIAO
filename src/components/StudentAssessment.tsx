@@ -169,6 +169,7 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
   const mobileDetectedSpeechRef = useRef<boolean>(false);
   const mobileInterimRef = useRef<string>('');
   const mobileFinalRef = useRef<string>('');
+  const mobilePrefixRef = useRef<string>('');
 
   const PLAYBACK_SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
@@ -574,7 +575,7 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
     }
     setIsMobileDictating(false);
 
-    const raw = (mobileFinalRef.current + ' ' + mobileInterimRef.current).trim();
+    const raw = [mobilePrefixRef.current, mobileFinalRef.current || mobileInterimRef.current].filter(Boolean).join(' ').trim();
     if (raw) {
       const normalized = normalizeTranscribedSpeech(raw, true);
       setLiveTranscript(normalized);
@@ -600,10 +601,11 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
     try {
       const recognition = new SpeechRecognition();
       recognition.lang = 'en-US';
-      recognition.continuous = true;
+      recognition.continuous = false;
       recognition.interimResults = true;
       recognition.maxAlternatives = 1;
 
+      mobilePrefixRef.current = (liveTranscript || '').trim();
       mobileFinalRef.current = '';
       mobileInterimRef.current = '';
       mobileDetectedSpeechRef.current = false;
@@ -625,25 +627,17 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
       }, 6000);
 
       recognition.onresult = (event: any) => {
-        let interim = '';
-        let final = '';
-
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          const item = event.results[i];
-          const transcript = item[0]?.transcript || '';
-          if (item.isFinal) {
-            final += transcript + ' ';
-          } else {
-            interim += transcript;
-          }
+        // Android gửi lại cả câu đã nghe ở mỗi kết quả → chỉ lấy kết quả cuối cùng, bản dài nhất
+        let best = '';
+        for (let i = 0; i < event.results.length; ++i) {
+          const t = (event.results[i][0]?.transcript || '').trim();
+          if (t.length >= best.length) best = t;
         }
-
-        if (final) {
-          mobileFinalRef.current = (mobileFinalRef.current + ' ' + final).trim();
-        }
-        mobileInterimRef.current = interim.trim();
-
-        const combined = (mobileFinalRef.current + ' ' + mobileInterimRef.current).trim();
+        best = best.replace(/\b(\w+(?:\s+\w+){0,5})(\s+\1\b)+/gi, '$1');   // bỏ cụm từ lặp liền nhau nếu còn sót
+        const isFinal = event.results[event.results.length - 1]?.isFinal;
+        if (isFinal) { mobileFinalRef.current = best; mobileInterimRef.current = ''; }
+        else { mobileInterimRef.current = best; }
+        const combined = [mobilePrefixRef.current, mobileFinalRef.current || mobileInterimRef.current].filter(Boolean).join(' ').trim();
         if (combined) {
           mobileDetectedSpeechRef.current = true;
           setLiveTranscript(formatRawLiveSpeech(combined));
@@ -871,6 +865,7 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
     if (mobileSilenceTimerRef.current) clearTimeout(mobileSilenceTimerRef.current);
     if (mobileNoSpeechTimerRef.current) clearTimeout(mobileNoSpeechTimerRef.current);
     isMobileDictatingRef.current = false;
+    mobilePrefixRef.current = '';
     setIsMobileDictating(false);
     setIsMobileSpeechDictated(false);
     setLiveTranscript('');
@@ -1083,6 +1078,7 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
     if (mobileSilenceTimerRef.current) clearTimeout(mobileSilenceTimerRef.current);
     if (mobileNoSpeechTimerRef.current) clearTimeout(mobileNoSpeechTimerRef.current);
     isMobileDictatingRef.current = false;
+    mobilePrefixRef.current = '';
     setIsMobileDictating(false);
     setIsMobileSpeechDictated(false);
     setLiveTranscript('');
