@@ -54,6 +54,9 @@ import {
   ReportExportData,
 } from '../utils/speakingReportExporter';
 
+const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+const isInAppBrowser = typeof navigator !== 'undefined' && /Zalo|FBAN|FBAV|Messenger|Instagram/i.test(navigator.userAgent);
+
 interface StudentAssessmentProps {
   onShowToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
   studentName: string;
@@ -113,6 +116,8 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
   const [isListeningSpeech, setIsListeningSpeech] = useState(false);
   const [isFinalizingSpeech, setIsFinalizingSpeech] = useState(false);
   const [isTranscriptManuallyEdited, setIsTranscriptManuallyEdited] = useState(false);
+  const [showMobileVoicePrompt, setShowMobileVoicePrompt] = useState(false);
+  const [isMobileVoiceReentered, setIsMobileVoiceReentered] = useState(false);
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
@@ -122,6 +127,7 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
   const [capturedSnapshotSecond, setCapturedSnapshotSecond] = useState<number>(0);
   const [mediaTotalDuration, setMediaTotalDuration] = useState<number>(0);
 
+  const transcriptTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const audioTimerRef = useRef<any>(null);
   const videoTimerRef = useRef<any>(null);
   const audioMediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -607,6 +613,8 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
     if (!isAudioRecording) {
       resetAnalysis();
       setLiveTranscript('');
+      setShowMobileVoicePrompt(false);
+      setIsMobileVoiceReentered(false);
       hasNotifiedNoSpeechRef.current = false;
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -670,12 +678,23 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
       if (audioMediaRecorderRef.current && audioMediaRecorderRef.current.state !== 'inactive') {
         audioMediaRecorderRef.current.stop();
       }
-      await stopSpeechRecognition();
+      const finalRecordedTranscript = await stopSpeechRecognition();
       const curAudioSec = audioSeconds;
       const initialDur = curAudioSec > 0 ? curAudioSec : 15;
       setMediaTotalDuration(initialDur);
       setCapturedSnapshotSecond(Math.max(1, Math.min(initialDur - 1, Math.round(initialDur * 0.35))));
-      onShowToast('Đã ghi âm xong!', 'success');
+
+      const hasSpokenWords = Boolean(finalRecordedTranscript && finalRecordedTranscript.trim().length > 0);
+      if (!hasSpokenWords && isMobile) {
+        setShowMobileVoicePrompt(true);
+        setIsMobileVoiceReentered(true);
+        setTimeout(() => {
+          transcriptTextareaRef.current?.focus();
+        }, 150);
+      } else {
+        setShowMobileVoicePrompt(false);
+        onShowToast('Đã ghi âm xong!', 'success');
+      }
     }
   };
 
@@ -692,6 +711,8 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
     latestRawTextRef.current = '';
     lastRecognizedTranscriptRef.current = '';
     setIsTranscriptManuallyEdited(false);
+    setShowMobileVoicePrompt(false);
+    setIsMobileVoiceReentered(false);
     setLiveTranscript('');
   };
 
@@ -862,8 +883,18 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
       if (videoMediaRecorderRef.current && videoMediaRecorderRef.current.state !== 'inactive') {
         videoMediaRecorderRef.current.stop();
       }
-      await stopSpeechRecognition();
-      onShowToast('Đã hoàn thành ghi hình video!', 'success');
+      const finalRecordedTranscript = await stopSpeechRecognition();
+      const hasSpokenWords = Boolean(finalRecordedTranscript && finalRecordedTranscript.trim().length > 0);
+      if (!hasSpokenWords && isMobile) {
+        setShowMobileVoicePrompt(true);
+        setIsMobileVoiceReentered(true);
+        setTimeout(() => {
+          transcriptTextareaRef.current?.focus();
+        }, 150);
+      } else {
+        setShowMobileVoicePrompt(false);
+        onShowToast('Đã hoàn thành ghi hình video!', 'success');
+      }
     }
   };
 
@@ -879,6 +910,8 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
     latestRawTextRef.current = '';
     lastRecognizedTranscriptRef.current = '';
     setIsTranscriptManuallyEdited(false);
+    setShowMobileVoicePrompt(false);
+    setIsMobileVoiceReentered(false);
     setLiveTranscript('');
     startCamera();
   };
@@ -1121,6 +1154,7 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
         totalDurationSeconds: activeDur,
         inputMethod,
         isTranscriptManuallyEdited,
+        isMobileVoiceReentered: isMobile && isMobileVoiceReentered && !lastRecognizedTranscriptRef.current,
       };
 
       if (format === 'pdf') {
@@ -1148,6 +1182,11 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
 
   return (
     <div id="student-view-wrapper" className="space-y-4">
+      {isInAppBrowser && (
+        <div className="max-w-5xl mx-auto w-full bg-amber-950/80 border border-amber-500/50 rounded-xl px-4 py-2.5 text-xs text-amber-200 flex items-center justify-between gap-2 shadow-lg">
+          <span>Để ghi âm tốt nhất, em bấm ⋮ → Mở bằng Chrome.</span>
+        </div>
+      )}
       <div className="max-w-5xl mx-auto w-full bg-[#0b1122]/95 backdrop-blur-xl rounded-2xl p-5 sm:p-7 shadow-[0_0_50px_rgba(6,182,212,0.1)] border border-cyan-500/25 text-slate-100 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_12px_rgba(6,182,212,0.8)]" />
 
@@ -1808,7 +1847,8 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
             isVideoRecording ||
             (inputMethod === 'upload' && Boolean(uploadedFile)) ||
             Boolean(audioBlobUrl) ||
-            Boolean(videoBlobUrl)) && (
+            Boolean(videoBlobUrl) ||
+            showMobileVoicePrompt) && (
             <div className="w-full max-w-xl mt-3 p-3.5 bg-[#0d162d] border border-cyan-500/40 rounded-xl text-xs text-slate-200 shadow-lg">
               <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
                 <div className="flex items-center gap-1.5">
@@ -1837,8 +1877,16 @@ export const StudentAssessment: React.FC<StudentAssessmentProps> = ({
                   )}
                 </div>
               </div>
+
+              {showMobileVoicePrompt && (
+                <div className="mb-2.5 p-3 rounded-lg bg-amber-950/70 border border-amber-500/60 text-amber-200 text-xs leading-relaxed shadow-md">
+                  📱 Trên điện thoại, máy chưa tự nghe được lời trong lúc ghi âm. Bài ghi âm của em vẫn được lưu. Em chạm vào ô bên dưới, bấm nút 🎤 trên bàn phím và đọc lại đúng câu em vừa nói (hoặc gõ lại), rồi bấm chấm điểm.
+                </div>
+              )}
+
               <div className="relative">
                 <textarea
+                  ref={transcriptTextareaRef}
                   value={liveTranscript}
                   onChange={(e) => {
                     const newVal = e.target.value;

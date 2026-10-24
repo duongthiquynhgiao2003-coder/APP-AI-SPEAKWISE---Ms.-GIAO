@@ -15,6 +15,7 @@ export interface ReportExportData {
   totalDurationSeconds?: number;
   inputMethod?: 'upload' | 'record' | 'video';
   isTranscriptManuallyEdited?: boolean;
+  isMobileVoiceReentered?: boolean;
 }
 
 /**
@@ -1953,6 +1954,10 @@ export function buildSpeakingReportHtml(data: ReportExportData, forPdf = false):
           data.inputMethod === 'upload'
             ? `<div style="font-size: 8.5px; color: #64748b; font-style: italic; margin-top: 3px;">
                  Nguồn lời nói: học sinh gõ lại từ file tải lên.
+               </div>`
+            : data.isMobileVoiceReentered
+            ? `<div style="font-size: 8.5px; color: #64748b; font-style: italic; margin-top: 3px;">
+                 Nguồn lời nói: học sinh nhập lại trên điện thoại sau khi ghi âm.
                </div>`
             : data.isTranscriptManuallyEdited
             ? `<div style="font-size: 8.5px; color: #64748b; font-style: italic; margin-top: 3px;">
